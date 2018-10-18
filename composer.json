@@ -1,0 +1,15 @@
+{
+    "name": "khoa/reelance",
+    "type": "Module",
+    "authors": [
+        {
+            "name": "Khoa Mai",
+            "email": "maidinhkhoa92@gmail.com"
+        }
+    ],
+    "require": {
+    },
+    "config": {
+    	"optimize-autoloader": true
+    }
+}

@@ -1,0 +1,28 @@
+{
+  "cartItems": [
+    {
+      "name": "Test",
+      "price": 200,
+      "quantity": 2,
+      "id": 1
+    },
+    {
+      "name": "Test 2",
+      "price": 120,
+      "quantity": 1,
+      "id": 2
+    },
+    {
+      "name": "Test 3",
+      "price": 120,
+      "quantity": 3,
+      "id": 3
+    },
+    {
+      "name": "Test 4",
+      "price": 120,
+      "quantity": 3, 
+      "id": 4
+    }
+  ]
+}
