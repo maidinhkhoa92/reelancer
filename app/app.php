@@ -8,33 +8,42 @@ use payment\authorization;
 
 $authorization = new authorization();
 $return = json_decode($authorization->checkGateway());
-$params = new \stdClass;
-$data = json_decode(file_get_contents("data.json"));
-for($i=0; $i < count($data->cartItems); $i++){
-  $params->order->item[$i]->name = $data->cartItems[$i]->name;
-  $params->order->item[$i]->unitPrice = $data->cartItems[$i]->price;
-  $params->order->item[$i]->quantity = $data->cartItems[$i]->quantity;
-  $params->order->item[$i]->sku = $data->cartItems[$i]->id;
-}
-if(isset($_POST['checkout'])) {
-  $firstName = $_POST['firstName'];
-  $lastName = $_POST['lastName'];
-  $cardNumber = str_replace(" ","",$_POST['cardNumber']);;
-  $cardExpired = $_POST['cardExpired'];
-  list($cardExpiredMonth, $cardExpiredYear) = explode('/', $cardExpired);
-  $cardCVC = $_POST['cardCVC'];
 
-  $params->apiOperation =  "AUTHORIZE";
-  $params->order->currency =  "USD";
-  $params->order->amount =  100;
-  $params->sourceOfFunds->provided->card->expiry->month = '"'.$cardExpiredMonth.'"';
-  $params->sourceOfFunds->provided->card->expiry->year = '"'.substr($cardExpiredYear, -2).'"';
-  $params->sourceOfFunds->provided->card->number = '"'.$cardNumber.'"';
-  $params->sourceOfFunds->provided->card->nameOnCard = '"'.$firstName.' '.$lastName.'"';
-  $params->sourceOfFunds->provided->card->securityCode = '"'.$cardCVC.'"';
-  $params->sourceOfFunds->type = 'CARD';
-  $return = $authorization->authorization($_POST['orderId'], $params, $_POST['transactionID']);
-}
+if($return->status == "OPERATING"){
+  $params = new \stdClass;
+  $data = json_decode(file_get_contents("data.json"));
+
+  // convert data into params
+  for($i=0; $i < count($data->cartItems); $i++){
+    $params->order->item[$i]->name = $data->cartItems[$i]->name;
+    $params->order->item[$i]->unitPrice = $data->cartItems[$i]->price;
+    $params->order->item[$i]->quantity = $data->cartItems[$i]->quantity;
+    $params->order->item[$i]->sku = $data->cartItems[$i]->id;
+  }
+
+  // submit action
+  if(isset($_POST['checkout'])) {
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
+    $cardNumber = str_replace(" ","",$_POST['cardNumber']);
+    $cardExpired = $_POST['cardExpired'];
+    list($cardExpiredMonth, $cardExpiredYear) = explode('/', $cardExpired);
+    $cardCVC = $_POST['cardCVC'];
+
+    $params->apiOperation =  "PAY";
+    $params->order->currency =  "USD";
+    $params->order->amount =  1240.00;
+    $params->sourceOfFunds->provided->card->expiry->month = $cardExpiredMonth;
+    $params->sourceOfFunds->provided->card->expiry->year = substr($cardExpiredYear, -2);
+    $params->sourceOfFunds->provided->card->number = $cardNumber;
+    $params->sourceOfFunds->provided->card->nameOnCard = $firstName.' '.$lastName;
+    $params->sourceOfFunds->provided->card->securityCode = $cardCVC;
+    $params->sourceOfFunds->type = 'CARD';
+
+    // call request
+    $return = json_decode($authorization->pay($_POST['orderId'], $params, $_POST['transactionID']));
+    print_r($return);
+  }
 
 ?>
 <div class="card">
@@ -85,8 +94,8 @@ if(isset($_POST['checkout'])) {
                 </div>
                 <div id="check_typeCard"></div>
                 <div class="col-12">
-                  <input type="hidden" name="orderId" value="1" />
-                  <input type="hidden" name="transactionID" value="1" />
+                  <input type="hidden" name="orderId" value="2" />
+                  <input type="hidden" name="transactionID" value="3" />
                   <button name="checkout" type="submit" id="submit" class="btn btn-primary" onclick="">Pagar</button>
                 </div>
             </div>
@@ -94,3 +103,4 @@ if(isset($_POST['checkout'])) {
 
     </div>
 </div>
+<?php } ?>
